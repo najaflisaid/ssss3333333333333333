@@ -1,0 +1,108 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Manrope:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 42 35% 98%;
+    --foreground: 29 17% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 29 17% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 29 17% 11%;
+    --primary: 139 68% 15%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 29 10% 96%;
+    --secondary-foreground: 29 17% 11%;
+    --muted: 29 10% 96%;
+    --muted-foreground: 29 10% 45%;
+    --accent: 28 92% 44%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 29 10% 91%;
+    --input: 29 10% 91%;
+    --ring: 139 68% 15%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 24 11% 3%;
+    --foreground: 29 10% 91%;
+    --card: 29 17% 11%;
+    --card-foreground: 29 10% 91%;
+    --popover: 29 17% 11%;
+    --popover-foreground: 29 10% 91%;
+    --primary: 142 71% 45%;
+    --primary-foreground: 140 83% 9%;
+    --secondary: 29 11% 16%;
+    --secondary-foreground: 29 10% 91%;
+    --muted: 29 11% 16%;
+    --muted-foreground: 29 10% 60%;
+    --accent: 41 96% 48%;
+    --accent-foreground: 0 0% 0%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 29 11% 16%;
+    --input: 29 11% 16%;
+    --ring: 142 71% 45%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+}
+
+.book-card-hover {
+  transition: transform 0.3s ease-out;
+}
+
+.book-card-hover:hover {
+  transform: translateY(-8px);
+}
+
+/* Text wrapping - prevent text overlap */
+.text-wrap-normal {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+/* Preserve line breaks from textarea */
+.whitespace-pre-wrap {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Text justify - sətirləri tam doldur */
+.text-justify {
+  text-align: justify;
+  text-justify: inter-word;
+}
+
+/* Ensure all text elements don't overflow */
+p, span, h1, h2, h3, h4, h5, h6, div {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Description and content texts - justify */
+.prose p,
+.description-text,
+.content-text {
+  text-align: justify;
+  text-justify: inter-word;
+}
+
+/* Textarea - support enter for new line */
+textarea {
+  white-space: pre-wrap;
+}

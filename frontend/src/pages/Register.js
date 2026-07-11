@@ -9,6 +9,9 @@ import { RadioGroup, RadioGroupItem } from "../components/ui/radio-group";
 import { toast } from "sonner";
 import { useLanguage } from "../contexts/LanguageContext";
 import { Eye, EyeOff } from "lucide-react";
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
+import "../styles/phone-input.css";
 
 const Register = ({ onLogin }) => {
   const { t, language } = useLanguage();
@@ -17,7 +20,7 @@ const Register = ({ onLogin }) => {
     email: "",
     password: "",
     name: "",
-    phone: "", // Only 9 digits after +994
+    phone: "", // Full international phone (digits only, incl. country code)
     account_type: "author",
     store_name: ""
   });
@@ -27,15 +30,12 @@ const Register = ({ onLogin }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
-    // Phone validation - only allow 9 digits
-    if (name === 'phone') {
-      const digitsOnly = value.replace(/\D/g, '').slice(0, 9);
-      setFormData({ ...formData, phone: digitsOnly });
-      return;
-    }
-    
     setFormData({ ...formData, [name]: value });
+  };
+
+  const handlePhoneChange = (value) => {
+    // value is digits only from react-phone-input-2 (no plus sign)
+    setFormData((prev) => ({ ...prev, phone: value || "" }));
   };
 
   const handleAccountTypeChange = (value) => {
@@ -50,12 +50,12 @@ const Register = ({ onLogin }) => {
       return;
     }
     
-    // Phone validation - if provided, must be exactly 9 digits
-    if (formData.phone && formData.phone.length !== 9) {
+    // Phone validation - if provided, must be at least 8 digits (international)
+    if (formData.phone && formData.phone.length < 8) {
       toast.error(
-        language === 'az' ? 'Telefon nömrəsi 9 rəqəm olmalıdır' :
-        language === 'en' ? 'Phone number must be 9 digits' :
-        'Номер телефона должен содержать 9 цифр'
+        language === 'az' ? 'Telefon nömrəsi tam deyil' :
+        language === 'en' ? 'Phone number is incomplete' :
+        'Номер телефона неполный'
       );
       return;
     }
@@ -68,8 +68,8 @@ const Register = ({ onLogin }) => {
     setLoading(true);
 
     try {
-      // Full phone number with +994 prefix (only if provided)
-      const fullPhone = formData.phone ? `+994${formData.phone}` : "";
+      // Full phone number in E.164 format with +
+      const fullPhone = formData.phone ? `+${formData.phone}` : "";
       
       const result = await registerUser(
         formData.email,
@@ -167,7 +167,7 @@ const Register = ({ onLogin }) => {
             <Input id="email" name="email" type="email" value={formData.email} onChange={handleChange} required className="rounded-full" />
           </div>
           
-          {/* Phone with +994 prefix - Optional */}
+          {/* Phone with international country picker - Optional */}
           <div className="space-y-2">
             <Label htmlFor="phone">
               {t('whatsapp')} 
@@ -175,25 +175,36 @@ const Register = ({ onLogin }) => {
                 ({language === 'az' ? 'istəyə bağlı' : language === 'en' ? 'optional' : 'необязательно'})
               </span>
             </Label>
-            <div className="flex">
-              <div className="flex items-center px-4 bg-secondary border border-r-0 border-border rounded-l-full text-sm font-medium">
-                +994
-              </div>
-              <Input
-                id="phone"
-                name="phone"
-                type="tel"
-                value={formData.phone}
-                onChange={handleChange}
-                className="rounded-l-none rounded-r-full"
-                placeholder="XXXXXXXXX"
-                maxLength={9}
-              />
-            </div>
+            <PhoneInput
+              country={'az'}
+              preferredCountries={['az', 'tr', 'ru', 'ge', 'us', 'gb', 'de']}
+              value={formData.phone}
+              onChange={handlePhoneChange}
+              enableSearch={true}
+              searchPlaceholder={
+                language === 'az' ? 'Ölkə axtar' :
+                language === 'en' ? 'Search country' :
+                'Поиск страны'
+              }
+              searchNotFound={
+                language === 'az' ? 'Tapılmadı' :
+                language === 'en' ? 'No entries to show' :
+                'Ничего не найдено'
+              }
+              inputProps={{
+                id: 'phone',
+                name: 'phone',
+                'data-testid': 'register-phone-input',
+              }}
+              containerClass="phone-input-container"
+              inputClass="phone-input-field"
+              buttonClass="phone-input-button"
+              dropdownClass="phone-input-dropdown"
+            />
             <p className="text-xs text-muted-foreground">
-              {language === 'az' ? '9 rəqəm daxil edin (məs: 501234567). Boş buraxsanız sifarişlər emailə gələcək.' :
-               language === 'en' ? 'Enter 9 digits (e.g: 501234567). Leave empty to receive orders via email.' :
-               'Введите 9 цифр. Оставьте пустым для получения заказов по email.'}
+              {language === 'az' ? 'Ölkə kodunu seçib nömrəni daxil edin. Boş buraxsanız sifarişlər emailə gələcək.' :
+               language === 'en' ? 'Select country code and enter your number. Leave empty to receive orders via email.' :
+               'Выберите код страны и введите номер. Оставьте пустым для получения заказов по email.'}
             </p>
           </div>
           
